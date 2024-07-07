@@ -3,15 +3,16 @@ import { AuthGuard } from '@nestjs/passport';
 
 import { SignUpDto } from './dto/signUp.dto';
 import { LogInDto } from './dto/logIn.dto';
+
 import { User } from './entities/user.entity';
 import { UserService } from './user.service';
 import { UserInfo } from 'src/utils/userInfo.decorator';
 
-@Controller('user')
+@Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  /** 회원등록(sign-up) API **/
+  /** 회원 가입(sign-up) API **/
   @Post('sign-up')
   async signUp(@Body() signUpDto: SignUpDto) {
     return await this.userService.signUp(
@@ -29,8 +30,8 @@ export class UserController {
 
   /** 회원 정보 조회 API **/
   @UseGuards(AuthGuard('jwt'))
-  @Get('user-info')
-  getEmail(@UserInfo() user: User) {
-    return { email: user.email };
+  @Get('me')
+  async myProfile(@UserInfo() user: User) {
+    return await this.userService.myProfile(user);
   }
 }

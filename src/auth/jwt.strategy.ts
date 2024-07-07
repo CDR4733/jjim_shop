@@ -23,7 +23,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   async validate(payload: any) {
     // 1. 페이로드에 담긴 email을 통해 사용자 찾기
     const user = await this.userService.findByEmail(payload.email);
-    // 1-1. 만약 존재하지 않는다면
+    // 1-1. 만약 존재하지 않는다면 에러메시지(404)
     if (_.isNil(user)) {
       throw new NotFoundException(`사용자를 찾을 수 없습니다.`);
     }
