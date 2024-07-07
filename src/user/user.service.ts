@@ -6,22 +6,29 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, DataSource } from 'typeorm';
 
 import { compare, hash } from 'bcrypt';
 import _ from 'lodash';
 
 import { User } from './entities/user.entity';
+import { Point } from 'src/point/entities/point.entity';
 
 @Injectable()
 export class UserService {
   constructor(
+    // 트랜잭션을 위한 준비!
+    private dataSource: DataSource,
+
     @InjectRepository(User)
-    private userRpository: Repository<User>,
+    private userRepository: Repository<User>,
     private readonly jwtService: JwtService,
+
+    @InjectRepository(Point)
+    private pointRepository: Repository<Point>,
   ) {}
 
-  /** 회원등록(sign-up) API **/
+  /** 회원 가입(sign-up) API **/
   // email, nickname, password
   async signUp(email: string, nickname: string, password: string) {
     // 1. 해당 email로 가입한 user가 존재하는지?
@@ -45,12 +52,46 @@ export class UserService {
     // 3. 비밀번호는 hash할 것
     const hashedPassword = await hash(password, 10);
 
-    // 4. 해당 정보들로 회원등록 완료
-    await this.userRpository.save({
-      email,
-      nickname,
-      password: hashedPassword,
-    });
+    // 트랜잭션!!!!!!!!!!! TypeORM식 트랜잭션 새로 익힌 내용이니 꼭 복습하기!!
+    // 4. 해당 정보들로 회원등록 + 포인트 테이블 데이터 생성! (트랜잭션)
+    // 4-1. 트랜잭션 시작 가즈아!
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    // 4-2. 트랜잭션 묶기
+    // : try(트랜잭션 묶음) - catch(에러=롤백)
+    // - finally(트랜잭션 최종완료; try성공하든 에러가 떠서 catch로 걸리든 이후 finally는 항상 실행)
+    try {
+      // 4-2-1. 신규 회원 데이터 생성 (회원가입)
+      const newMember = await queryRunner.manager.save(User, {
+        email,
+        nickname,
+        password: hashedPassword,
+      });
+      // 4-2-2. 포인트 데이터 생성 (포인트)
+      const newPoint = await queryRunner.manager.save(Point, {
+        userId: newMember.userId,
+        point: 1000000,
+      });
+      // 4-2-3. 성공 : 트랜잭션 묶음 종료: commit
+      await queryRunner.commitTransaction();
+      // 4-3-성공시. 트랜잭션 된 상태를 release하면서 트랜잭션 최종완료
+      await queryRunner.release();
+      // 5. 리턴
+      return {
+        status: 201,
+        message: '회원 가입이 완료되었습니다.',
+        data: {
+          newMember,
+          newPoint,
+        },
+      };
+    } catch (err) {
+      // 4-2-4. 실패 : 도중에 에러 발생시 롤백하기
+      await queryRunner.rollbackTransaction();
+      // 4-3-실패시. 롤백된 상태를 release하면서 트랜잭션 최종완료
+      await queryRunner.release();
+    }
   }
 
   /** 로그인(log-in) API **/
@@ -76,18 +117,33 @@ export class UserService {
 
     // 5. Access Token 발급
     return {
+      status: 200,
       message: `${user.nickname} 님, 어서오세요!`,
       accessToken: this.jwtService.sign(payload),
     };
   }
 
-  /** email로 사용자 찾기 **/
-  async findByEmail(email: string) {
-    return await this.userRpository.findOneBy({ email });
+  /** 회원 정보 조회(R) API **/
+  async myProfile(user: User) {
+    const point = await this.pointRepository.findOneBy({ userId: user.userId });
+    return {
+      status: 200,
+      message: '회원 정보 조회가 완료되었습니다.',
+      data: {
+        email: user.email,
+        nickname: user.nickname,
+        point: point.point,
+      },
+    };
   }
 
-  /** nickname으로 사용자 찾기 **/
+  /** email로 사용자 찾기(+) **/
+  async findByEmail(email: string) {
+    return await this.userRepository.findOneBy({ email });
+  }
+
+  /** nickname으로 사용자 찾기(+) **/
   async findByNickname(nickname: string) {
-    return await this.userRpository.findOneBy({ nickname });
+    return await this.userRepository.findOneBy({ nickname });
   }
 }

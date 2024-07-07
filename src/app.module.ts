@@ -1,15 +1,21 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
+import Joi from 'joi';
+import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
-import Joi from 'joi';
-import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { AuthModule } from './auth/auth.module';
 import { User } from './user/entities/user.entity';
 import { UserModule } from './user/user.module';
+import { Point } from './point/entities/point.entity';
+import { PointModule } from './point/point.module';
+import { Place } from './place/entities/place.entity';
+import { PlaceModule } from './place/place.module';
+import { ShowModule } from './show/show.module';
+import { ReservationModule } from './reservation/reservation.module';
 
 const typeOrmModuleOptions = {
   // useFactory : 원래 설정이라는 것은 정적 옵션으로 주로 쓰이는데
@@ -24,7 +30,7 @@ const typeOrmModuleOptions = {
     host: configService.get('DB_HOST'),
     port: configService.get('DB_PORT'),
     database: configService.get('DB_NAME'),
-    entities: [User], // 엔터티는 여기에다가!!
+    entities: [User, Point, Place], // 엔터티는 여기에다가!!
     synchronize: configService.get('DB_SYNC'),
     logging: true,
   }),
@@ -51,6 +57,10 @@ const typeOrmModuleOptions = {
     TypeOrmModule.forRootAsync(typeOrmModuleOptions),
     AuthModule,
     UserModule,
+    PointModule,
+    PlaceModule,
+    ShowModule,
+    ReservationModule,
   ],
   controllers: [AppController],
   providers: [AppService],

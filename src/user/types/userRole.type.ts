@@ -1,4 +1,4 @@
 export enum Role {
-  USER,
-  ADMIN,
+  USER, // 일반사용자
+  ADMIN, // 관리자
 }
