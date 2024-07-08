@@ -1,3 +1,5 @@
+# jjim_shop : 찜샵 예매사이트
+
 <p align="center">
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
 </p>
@@ -58,15 +60,36 @@ $ npm run test:e2e
 $ npm run test:cov
 ```
 
+## 공연장(place) 좌석 정보 등록 관련
+- placeSeatSection: 높은 등급의 좌석 구역부터 낮은 등급의 좌석 구역까지 쉼표로 구분하여 string으로 입력
+- placeSeatNumber: 위에서 구분한 등급의 각 좌석 수를 순서에 맞춰 쉼표로 구분하여 입력
+- 예시: 좌석구역(placeSeatSection): "S,A,B", 좌석번호(placeSeatNumber): "10,30,50"
+
+
+## 공연(show) 요금, 날짜/시간 정보 등록 관련
+- showFee: 높은 등급의 좌석 구역 요금부터 낮은 등급의 좌석 구역 요금까지 쉼표로 구분하여 string으로 입력
+- showDate: "연도.월.일.시:분, 연도.월.일.시:분, ..." 형식으로 입력
+- 예시: 요금(showFee): "50000,30000,20000", 날짜/시간(showDate): "2024.07.08.03:00,2024.07.08.05:00"
+
+
+## 예매(reservation) 날짜/시간 정보 등록 관련
+- showDate: "연도.월.일.시:분" 형식으로 입력
+- 예시: "2024.07.08.03:00"
+
+
+## API 명세서
+https://shocking-flavor-85b.notion.site/API-46c8e6a4031945e0a5f348061192d875?pvs=4
+
+
+## ERD 설계
+https://drawsql.app/teams/teamcdr/diagrams/jjim-shop
+
+
 ## Support
 
 Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
 
-## Stay in touch
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
 
 ## License
 
