@@ -23,10 +23,10 @@ export class Place {
   @Column({ type: 'varchar', nullable: false })
   placeAddress: string;
 
-  @Column({ type: 'array', nullable: false })
+  @Column({ type: 'json', nullable: false })
   placeSeatSection: string[];
 
-  @Column({ type: 'array', nullable: false })
+  @Column({ type: 'json', nullable: false })
   placeSeatNumber: number[];
 
   @CreateDateColumn()

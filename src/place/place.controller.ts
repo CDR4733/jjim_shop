@@ -64,14 +64,10 @@ export class PlaceController {
     @Param('placeId') placeId: number,
     @Body() updatePlaceDto: UpdatePlaceDto,
   ) {
-    const updated = await this.placeService.updatePlaceInfo(
-      placeId,
-      updatePlaceDto,
-    );
+    await this.placeService.updatePlaceInfo(placeId, updatePlaceDto);
     return {
       status: 200,
       message: '공연장 정보 수정이 완료되었습니다.',
-      data: updated,
     };
   }
 
@@ -79,11 +75,10 @@ export class PlaceController {
   @Roles(Role.ADMIN)
   @Delete(':placeId')
   async deletePlaceInfo(@Param('placeId') placeId: number) {
-    const deleted = await this.placeService.deletePlaceInfo(placeId);
+    await this.placeService.deletePlaceInfo(placeId);
     return {
       status: 200,
       message: '공연장 정보 삭제가 완료되었습니다.',
-      data: deleted,
     };
   }
 }

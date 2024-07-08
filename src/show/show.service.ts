@@ -10,51 +10,129 @@ import _ from 'lodash';
 
 import { CreateShowDto } from './dto/create-show.dto';
 import { UpdateShowDto } from './dto/update-show.dto';
+import { Place } from 'src/place/entities/place.entity';
 import { Show } from './entities/show.entity';
 import { ShowCategory } from './types/show.type';
+import { Reservation } from 'src/reservation/entities/reservation.entity';
 
 @Injectable()
 export class ShowService {
   constructor(
     @InjectRepository(Show)
     private readonly showRepository: Repository<Show>,
+
+    @InjectRepository(Reservation)
+    private reservationRepository: Repository<Reservation>,
+
+    @InjectRepository(Place)
+    private placeRepository: Repository<Place>,
   ) {}
 
   /** 공연 목록 조회(R-L) API **/
-  async findAllShow(showCategory: ShowCategory): Promise<Show[]> {
+  async findAllShow(showCategory: ShowCategory) {
     // 1. 만약 카테고리를 설정하지 않았다면 '전체' 조회
-    if (_.isNull(showCategory)) {
-      return await this.showRepository.find({
+    if (!showCategory) {
+      const foundAll = await this.showRepository.find({
         order: { createdAt: 'DESC' },
       });
+      // 1-1. 데이터 가공
+      const AllDatas = foundAll.map((a) => {
+        return {
+          showName: a.showName,
+          showCategory: a.showCategory,
+          showPlace: a.showPlace,
+          showImage: a.showImage,
+          showFee: a.showFee,
+          showDate: a.showDate,
+        };
+      });
+      // 1-2. 가공된 데이터 반환
+      return AllDatas;
     }
     // 2. 만약 카테고리를 설정했다면 '카테고리' 조회
-    return await this.showRepository.find({
+    const foundCategory = await this.showRepository.find({
       where: { showCategory },
       order: { createdAt: 'DESC' },
     });
+    // 2-1. 데이터 가공
+    const CategoryDatas = foundCategory.map((c) => {
+      return {
+        showName: c.showName,
+        showCategory: c.showCategory,
+        showPlace: c.showPlace,
+        showImage: c.showImage,
+        showFee: c.showFee,
+        showDate: c.showDate,
+      };
+    });
+    // 2-2. 가공된 데이터 반환
+    return CategoryDatas;
   }
 
   /** 공연 검색 조회(R-L) API **/
   async searchAllShow(keyword: string) {
     // 1. 만약 검색어를 입력하지 않았다면 '전체' 조회 (최신순)
-    if (_.isNull(keyword)) {
-      return await this.showRepository.find({
+    if (!keyword) {
+      const noKeyword = await this.showRepository.find({
         order: { createdAt: 'DESC' },
       });
+      // 1-1. 데이터 가공
+      const nokwData = noKeyword.map((n) => {
+        return {
+          showName: n.showName,
+          showCategory: n.showCategory,
+          showPlace: n.showPlace,
+          showImage: n.showImage,
+          showFee: n.showFee,
+          showDate: n.showDate,
+        };
+      });
+      // 1-2. 가공된 데이터 반환
+      return nokwData;
     }
     // 2. 만약 검색어를 입력했다면 공연이름에 검색어가 포함된 것들 조회
-    return await this.showRepository.find({
+    const yesKeyword = await this.showRepository.find({
       where: { showName: Like(`%${keyword}%`) },
       order: { createdAt: 'DESC' },
     });
+    // 2-1. 데이터 가공
+    const yeskwData = yesKeyword.map((y) => {
+      return {
+        showName: y.showName,
+        showCategory: y.showCategory,
+        showPlace: y.showPlace,
+        showImage: y.showImage,
+        showFee: y.showFee,
+        showDate: y.showDate,
+      };
+    });
+    // 2-2. 가공된 데이터 반환
+    return yeskwData;
   }
 
   /** 공연 상세 조회(R-D) **/
   // showId
   async findOneShow(showId: number) {
     // 1. 해당 showId를 가진 공연 정보 조회
-    return await this.findByShowId(showId);
+    const showDetailInfo = await this.findByShowId(showId);
+
+    // // 2. 예매 가능 여부 확인
+    // // 2-1. 공연장 자리 정보 검증
+    // const placeSeatInfo = await this.placeRepository.findOneBy({
+    //   placeId: showDetailInfo.showPlace,
+    // });
+    // const SeatArray = placeSeatInfo.placeSeatNumber;
+    // const SeatCount = SeatArray.reduce((a, c) => a + c, 0); // 공연장 총 좌석 수
+
+    // // 2-2. 예매 좌석 정보 조회
+    // const reservationSeatInfo = await this.reservationRepository.findBy({
+    //   showId,
+
+    // })
+
+    // // 3. 예매가능 vs 매진 표시 // 시간이슈...ㅠㅠ 마저 만들어 볼 것! ***
+
+    return showDetailInfo;
   }
 
   /** 공연 등록(C) **/
@@ -62,11 +140,13 @@ export class ShowService {
     // 1. string으로 받은 string데이터를 array화
     // 1-1. showFee
     const cdtoShowFee = createShowDto.showFee;
+    console.log(cdtoShowFee);
     const createdShowFee = cdtoShowFee
       .trim()
       .split(',')
       .map((p) => Number(p))
       .sort((a, b) => b - a); // 높은 등급 순
+    console.log(cdtoShowFee, createdShowFee);
     // 1-2. showDate
     const cdtoShowDate = createShowDto.showDate;
     const createdShowDate = cdtoShowDate

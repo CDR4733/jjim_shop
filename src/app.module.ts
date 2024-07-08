@@ -14,7 +14,9 @@ import { Point } from './point/entities/point.entity';
 import { PointModule } from './point/point.module';
 import { Place } from './place/entities/place.entity';
 import { PlaceModule } from './place/place.module';
+import { Show } from './show/entities/show.entity';
 import { ShowModule } from './show/show.module';
+import { Reservation } from './reservation/entities/reservation.entity';
 import { ReservationModule } from './reservation/reservation.module';
 
 const typeOrmModuleOptions = {
@@ -30,9 +32,9 @@ const typeOrmModuleOptions = {
     host: configService.get('DB_HOST'),
     port: configService.get('DB_PORT'),
     database: configService.get('DB_NAME'),
-    entities: [User, Point, Place], // 엔터티는 여기에다가!!
+    entities: [User, Point, Place, Show, Reservation], // 엔터티는 여기에다가!!
     synchronize: configService.get('DB_SYNC'),
-    logging: true,
+    logging: false,
   }),
   inject: [ConfigService],
 };

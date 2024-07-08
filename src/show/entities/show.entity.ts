@@ -21,7 +21,7 @@ export class Show {
   @Column({ type: 'enum', enum: ShowCategory, nullable: false })
   showCategory: ShowCategory;
 
-  @Column({ type: 'number', nullable: false })
+  @Column({ type: 'int', nullable: false })
   showPlace: number;
 
   @Column({ type: 'text', nullable: true })
@@ -30,10 +30,10 @@ export class Show {
   @Column({ type: 'varchar', nullable: true })
   showImage: string;
 
-  @Column({ type: 'array', nullable: false })
+  @Column({ type: 'json', nullable: false })
   showFee: number[];
 
-  @Column({ type: 'array', nullable: false })
+  @Column({ type: 'json', nullable: false })
   showDate: string[];
 
   @Column({ type: 'varchar', nullable: false })

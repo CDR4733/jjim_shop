@@ -24,12 +24,13 @@ export class ReservationService {
 
     @InjectRepository(Reservation)
     private reservationRepository: Repository<Reservation>,
-    @InjectRepository(User)
-    private userRepository: Repository<User>,
+
     @InjectRepository(Point)
     private pointRepository: Repository<Point>,
+
     @InjectRepository(Place)
     private placeRepository: Repository<Place>,
+
     @InjectRepository(Show)
     private showRepository: Repository<Show>,
   ) {}
@@ -186,6 +187,7 @@ export class ReservationService {
       await queryRunner.rollbackTransaction();
       // 8-3-실패시. 롤백된 상태를 release하면서 트랜잭션 최종완료
       await queryRunner.release();
+      throw new ConflictException('이미 예약된 좌석입니다.');
     }
   }
 

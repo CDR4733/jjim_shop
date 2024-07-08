@@ -14,19 +14,19 @@ export class Reservation {
   @PrimaryGeneratedColumn()
   reservationId: number;
 
-  @Column({ type: 'number', nullable: false })
+  @Column({ type: 'int', nullable: false })
   userId: number;
 
-  @Column({ type: 'number', nullable: false })
+  @Column({ type: 'int', nullable: false })
   placeId: number;
 
-  @Column({ type: 'number', nullable: false })
+  @Column({ type: 'int', nullable: false })
   showId: number;
 
   @Column({ type: 'varchar', nullable: false })
   showName: string;
 
-  @Column({ type: 'number', nullable: false })
+  @Column({ type: 'int', nullable: false })
   showFee: number;
 
   @Column({ type: 'varchar', nullable: false })
@@ -35,7 +35,7 @@ export class Reservation {
   @Column({ type: 'varchar', nullable: false })
   seatSection: string;
 
-  @Column({ type: 'number', nullable: false })
+  @Column({ type: 'int', nullable: false })
   seatNumber: number;
 
   @CreateDateColumn()
