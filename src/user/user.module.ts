@@ -6,6 +6,7 @@ import { ConfigService } from '@nestjs/config';
 import { User } from './entities/user.entity';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
+import { Point } from 'src/point/entities/point.entity';
 
 @Module({
   imports: [
@@ -15,7 +16,7 @@ import { UserService } from './user.service';
       }),
       inject: [ConfigService],
     }),
-    TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([User, Point]),
   ],
   controllers: [UserController],
   providers: [UserService],

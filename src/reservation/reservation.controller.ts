@@ -28,7 +28,7 @@ export class ReservationController {
     const foundAll = await this.reservationService.findAllReservation(user);
     return {
       status: 200,
-      message: '예약 목록 조회가 완료되었습니다.',
+      message: '예매 목록 조회가 완료되었습니다.',
       data: foundAll,
     };
   }
@@ -45,7 +45,7 @@ export class ReservationController {
     );
     return {
       status: 200,
-      message: '예약 상세 조회가 완료되었습니다.',
+      message: '예매 상세 조회가 완료되었습니다.',
       data: foundOne,
     };
   }
@@ -62,7 +62,7 @@ export class ReservationController {
     );
     return {
       status: 201,
-      message: '예약이 완료되었습니다.',
+      message: '예매가 완료되었습니다.',
       data: reservation,
     };
   }
@@ -98,7 +98,7 @@ export class ReservationController {
     );
     return {
       status: 200,
-      message: '예약이 취소되었습니다.',
+      message: '예매가 취소되었습니다.',
       data: cancel,
     };
   }

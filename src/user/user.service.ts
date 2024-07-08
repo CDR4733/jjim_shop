@@ -78,6 +78,7 @@ export class UserService {
       // 4-3-성공시. 트랜잭션 된 상태를 release하면서 트랜잭션 최종완료
       await queryRunner.release();
       // 5. 리턴
+      newMember.password = undefined;
       return {
         status: 201,
         message: '회원 가입이 완료되었습니다.',
@@ -108,9 +109,12 @@ export class UserService {
     }
 
     // 3. 비밀번호가 일치하지 않는다면 에러메시지(401)
-    if (!(await compare(password, user.password))) {
+    const matched = await compare(password, user.password);
+
+    if (!matched) {
       throw new UnauthorizedException('비밀번호가 일치하지 않습니다.');
     }
+    user.password = undefined;
 
     // 4. 페이로드
     const payload = { email, sub: user.userId };

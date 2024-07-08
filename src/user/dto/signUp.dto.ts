@@ -1,3 +1,4 @@
+import { Exclude } from 'class-transformer';
 import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
 
 export class SignUpDto {
@@ -10,6 +11,7 @@ export class SignUpDto {
   nickname: string;
 
   @IsString()
+  @Exclude({ toPlainOnly: true })
   @IsNotEmpty({ message: '비밀번호를 입력해 주세요.' })
   password: string;
 }

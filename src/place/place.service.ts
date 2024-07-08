@@ -35,12 +35,13 @@ export class PlaceService {
   // placeName, placeImage, placeAddress, placeSeatInfo
   async registerPlaceInfo(createPlaceDto: CreatePlaceDto) {
     // 1. 이미 등록된 공연장인지 검색 (이름, 주소 모두 겹치는 경우)
-    const isExistingPlace = await this.placeRepository.find({
+    const isExistingPlace = await this.placeRepository.findOne({
       where: {
         placeName: createPlaceDto.placeName,
         placeAddress: createPlaceDto.placeAddress,
       },
     });
+    console.log(isExistingPlace);
     // 1-1. 이미 존재한다면 에러메시지(409)
     if (isExistingPlace) {
       throw new ConflictException(`이미 등록된 공연장입니다!`);

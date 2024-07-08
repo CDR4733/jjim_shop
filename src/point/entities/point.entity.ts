@@ -14,10 +14,10 @@ export class Point {
   @PrimaryGeneratedColumn()
   pointId: number;
 
-  @Column({ type: 'number', nullable: false })
+  @Column({ type: 'int', nullable: false })
   userId: number;
 
-  @Column({ type: 'number', nullable: false })
+  @Column({ type: 'int', nullable: false })
   point: number;
 
   @CreateDateColumn()

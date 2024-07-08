@@ -34,7 +34,18 @@ export class ShowController {
     };
   }
 
-  /** 공연 상세 조회(R-D) **/
+  /** 공연 검색 조회(R-L) API **/
+  @Get('search')
+  async searchAllShow(@Body('keyword') keyword: string) {
+    const searchAll = await this.showService.searchAllShow(keyword);
+    return {
+      status: 200,
+      message: '공연 검색 조회가 완료되었습니다.',
+      data: searchAll,
+    };
+  }
+
+  /** 공연 상세 조회(R-D) API **/
   @Get(':showId')
   async findOneShow(@Param('showId') showId: number) {
     const foundOne = await this.showService.findOneShow(showId);
@@ -45,7 +56,7 @@ export class ShowController {
     };
   }
 
-  /** 공연 등록(C) **/
+  /** 공연 등록(C) API **/
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN)
   @Post()
@@ -58,7 +69,7 @@ export class ShowController {
     };
   }
 
-  /** 공연 정보 수정(U) **/
+  /** 공연 정보 수정(U) API **/
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN)
   @Patch(':showId')
@@ -66,24 +77,22 @@ export class ShowController {
     @Param('showId') showId: number,
     @Body() updateShowDto: UpdateShowDto,
   ) {
-    const updated = await this.showService.updateShow(showId, updateShowDto);
+    await this.showService.updateShow(showId, updateShowDto);
     return {
       status: 200,
       message: '공연 정보 수정이 완료되었습니다.',
-      data: updated,
     };
   }
 
-  /** 공연 정보 삭제(D) **/
+  /** 공연 정보 삭제(D) API **/
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN)
   @Delete(':showId')
   async deleteShow(@Param('showId') showId: number) {
-    const deleted = await this.showService.deleteShow(showId);
+    await this.showService.deleteShow(showId);
     return {
       status: 200,
       message: '공연 정보 삭제가 완료되었습니다.',
-      data: deleted,
     };
   }
 }
