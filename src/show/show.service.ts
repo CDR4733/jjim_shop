@@ -115,24 +115,38 @@ export class ShowService {
   async findOneShow(showId: number) {
     // 1. 해당 showId를 가진 공연 정보 조회
     const showDetailInfo = await this.findByShowId(showId);
+    const DateArray = showDetailInfo.showDate;
 
-    // // 2. 예매 가능 여부 확인
-    // // 2-1. 공연장 자리 정보 검증
-    // const placeSeatInfo = await this.placeRepository.findOneBy({
-    //   placeId: showDetailInfo.showPlace,
-    // });
-    // const SeatArray = placeSeatInfo.placeSeatNumber;
-    // const SeatCount = SeatArray.reduce((a, c) => a + c, 0); // 공연장 총 좌석 수
+    // 2. 예매 가능 여부 확인
+    // 2-1. 공연장 자리 정보 검증
+    const placeSeatInfo = await this.placeRepository.findOneBy({
+      placeId: showDetailInfo.showPlace,
+    });
+    const SeatArray = placeSeatInfo.placeSeatNumber;
+    const SeatCount = SeatArray.reduce((a, c) => a + c, 0); // 공연장 총 좌석 수
 
-    // // 2-2. 예매 좌석 정보 조회
-    // const reservationSeatInfo = await this.reservationRepository.findBy({
-    //   showId,
+    // 2-2. 예매 좌석 정보 조회
+    let data = [];
+    for (let i = 0; i < DateArray.length; i++) {
+      const reservationSeatInfo = await this.reservationRepository.findBy({
+        showId,
+        showDate: DateArray[i],
+      });
+      let restSeat = SeatCount - reservationSeatInfo.length;
+      let seatStatus;
+      if (restSeat !== 0) {
+        seatStatus = `${DateArray[i]} : 예매가능 - 잔여좌석(${restSeat})`;
+      } else {
+        seatStatus = `${DateArray[i]} : 매진 - 잔여좌석(${restSeat})`;
+      }
+      data.push(seatStatus);
+    }
 
-    // })
-
-    // // 3. 예매가능 vs 매진 표시 // 시간이슈...ㅠㅠ 마저 만들어 볼 것! ***
-
-    return showDetailInfo;
+    // 3. 상세정보 + 예매가능 vs 매진 표시
+    return {
+      showDetailInfo,
+      data,
+    };
   }
 
   /** 공연 등록(C) **/
